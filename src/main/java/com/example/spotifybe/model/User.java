@@ -4,6 +4,7 @@ package com.example.spotifybe.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
@@ -20,6 +21,10 @@ public class User {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
     private String avatar;
+    private String biography;
+    private String country;
+    @Column(nullable = false)
+    private Timestamp createdAt;
 
     public Long getUserId() {
         return userID;

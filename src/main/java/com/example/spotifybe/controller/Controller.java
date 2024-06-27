@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -41,8 +43,11 @@ public class Controller {
 
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody User user) {
+        Date date = new Date();
+        Timestamp timestamp = new Timestamp(date.getTime());
         List<User> users = userService.findAll();
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setCreatedAt(timestamp);
         User userRes = userService.save(user);
         return new ResponseEntity<>(userRes, HttpStatus.OK);
     }

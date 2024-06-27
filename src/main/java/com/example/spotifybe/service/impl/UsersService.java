@@ -56,7 +56,7 @@ public class UsersService implements IUserService {
         Iterable<User> users = userRepository.findAll();
         boolean isCorrectUser = false;
         for (User currentUser : users) {
-            if (currentUser.getUserName().equals(user.getUserName()) && user.getPassword().equals(currentUser.getPassword())) {
+            if (currentUser.getUserName().equals(user.getUserName()) || currentUser.getPhone().equals(user.getPhone()) && user.getPassword().equals(currentUser.getPassword())) {
                 isCorrectUser = true;
                 break;
             }

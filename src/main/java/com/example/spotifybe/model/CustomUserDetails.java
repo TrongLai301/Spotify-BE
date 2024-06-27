@@ -12,28 +12,30 @@ import java.util.stream.Collectors;
 public class CustomUserDetails implements UserDetails {
     private static final long serivalVersionUID = 1L;
     private long id;
-
     private String email;
-
+    private String phone;
     private String password;
-
     private Collection<? extends GrantedAuthority> roles;
 
-    public CustomUserDetails(long id, String email, String password, Collection<? extends GrantedAuthority> roles) {
+    public CustomUserDetails(long id, String email, String password, Collection<? extends GrantedAuthority> roles, String phone) {
         this.id = id;
+        this.phone = phone;
         this.email = email;
         this.password = password;
         this.roles = roles;
     }
+
     public static CustomUserDetails build(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
         return new CustomUserDetails(
                 user.getUserId(),
                 user.getEmail(),
                 user.getPassword(),
-                authorities
+                authorities,
+                user.getPhone()
         );
     }
+
     public long getId() {
         return id;
     }
@@ -47,6 +49,9 @@ public class CustomUserDetails implements UserDetails {
     public String getPassword() {
         return password;
     }
+
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
