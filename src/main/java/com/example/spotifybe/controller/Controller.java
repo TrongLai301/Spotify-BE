@@ -1,6 +1,7 @@
 package com.example.spotifybe.controller;
 
 import com.example.spotifybe.model.JwtResponse;
+import com.example.spotifybe.model.JwtToken;
 import com.example.spotifybe.model.Response;
 import com.example.spotifybe.model.User;
 import com.example.spotifybe.repository.IJwtTokenRepository;
@@ -8,6 +9,7 @@ import com.example.spotifybe.service.IUserService;
 import com.example.spotifybe.service.impl.JwtService;
 import com.example.spotifybe.service.impl.RolesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,10 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -66,6 +65,43 @@ public class Controller {
                     new JwtResponse(jwt, currentUser.getUserId(), userDetails.getUsername(), userDetails.getAuthorities())));
         } catch (Exception e) {
             return ResponseEntity.ok(new Response("401", "Account or password is incorrect", null));
+        }
+    }
+
+    //    @PostMapping("/logout")
+//    public ResponseEntity<String> logout(@RequestBody HttpHeaders headers) {
+//        String auth = headers.getFirst(HttpHeaders.AUTHORIZATION);
+//        if (auth != null && auth.startsWith("Bearer ")) {
+//            String token = auth.substring(7);
+//            JwtToken jwtToken = tokenRepository.findByTokenEquals(token);
+//
+//            if (jwtToken != null) {
+//                jwtToken.setValid(false);
+//                tokenRepository.save(jwtToken);
+//                return ResponseEntity.ok("Logout success");
+//            } else {
+//                return ResponseEntity.badRequest().body("Invalid token");
+//            }
+//        } else {
+//            return ResponseEntity.badRequest().body("Authorization header missing or invalid");
+//        }
+//    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            JwtToken jwtToken = tokenRepository.findByTokenEquals(token);
+
+            if (jwtToken != null && jwtToken.isValid()) {
+                jwtToken.setValid(false);
+                tokenRepository.save(jwtToken);
+                return ResponseEntity.ok("Logout success");
+            } else {
+                return ResponseEntity.badRequest().body("Invalid token");
+            }
+        } else {
+            return ResponseEntity.badRequest().body("Authorization header missing or invalid");
         }
     }
 }
